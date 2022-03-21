@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "boats"
+version = "1.0.0"
+description = "API доступа к информации о морских судах"
+authors = ["EXCPT"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+django = "=3.2"
+django-rest-framework = "=0.1.0"
+celery = "^5.2.3"
+uWSGI = "^2.0.20"
+openpyxl = "^3.0.9"
+python-dateutil = "^2.8.2"
+redis = "^4.1.4"
+psycopg2-binary = "^2.9.3"

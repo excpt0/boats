@@ -1,0 +1,56 @@
+
+services:
+  postgres:
+    image: postgres:11
+    networks:
+      - boatnet
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+  redis:
+    image: redis:6.2
+    networks:
+      boatnet:
+        ipv4_address: 192.168.0.123
+  app:
+    image: boats-app
+    networks:
+      - boatnet
+    ports:
+      - 8000:8000
+    command: "uwsgi --ini uwsgi.ini"
+    links:
+      - redis
+      - postgres
+  celery-worker:
+    image: boats-app
+    networks:
+      - boatnet
+    command: "celery -A core worker --loglevel=INFO"
+    environment:
+      - XLSX_DIR_PATH=/var/boats/files
+      - REDIS_DSN=redis://192.168.0.123:6379/0
+    volumes:
+      - ./files:/var/boats/files
+    links:
+      - redis
+      - postgres
+  celery-beat:
+    image: boats-app
+    networks:
+      - boatnet
+    command: "celery -A core beat"
+    environment:
+      - REDIS_DSN=redis://192.168.0.123:6379/0
+    links:
+      - redis
+      - postgres
+
+networks:
+  boatnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.1
